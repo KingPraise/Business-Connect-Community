@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bcc-yellow: #F5C518;
+  --color-bcc-dark: #0D0D0D;
+  --color-bcc-card: #1A1A1A;
+  --color-bcc-text: #FFFFFF;
+  --color-bcc-muted: #A0A0A0;
+
+  --font-display: 'Syne', 'Clash Display', system-ui, sans-serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-bcc-dark text-bcc-text font-sans antialiased;
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight text-white;
+  }
+
+  @media (min-width: 1024px) {
+    body, a, button, input, select, textarea, .cursor-pointer {
+      cursor: none !important;
+    }
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)];
+  }
+  
+  .glow-text {
+    text-shadow: 0 0 20px rgba(245, 197, 24, 0.5);
+  }
+}
+
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
