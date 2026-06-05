@@ -49,13 +49,42 @@ export default function Admin() {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File is too large. Please select an image under 5MB.");
+      if (file.size > 10 * 1024 * 1024) {
+        alert("File is too large. Please select an image under 10MB.");
         return;
       }
       const reader = new FileReader();
       reader.onloadend = () => {
-        setCurrentEvent({...currentEvent, imageUrl: reader.result});
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 1024;
+          const MAX_HEIGHT = 1024;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height = Math.round((height * MAX_WIDTH) / width);
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width = Math.round((width * MAX_HEIGHT) / height);
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Compress to JPEG with 0.6 quality to drastically speed up AI uploads
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+          setCurrentEvent({...currentEvent, imageUrl: compressedDataUrl});
+        };
+        img.src = reader.result;
       };
       reader.readAsDataURL(file);
     }
@@ -88,7 +117,22 @@ export default function Admin() {
     setIsScanning(true);
     try {
       const mimeType = currentEvent.imageUrl.substring(5, currentEvent.imageUrl.indexOf(';'));
-      const details = await extractEventDetailsFromImage(currentEvent.imageUrl, mimeType);
+      let storedApiKey = localStorage.getItem('BCC_GEMINI_API_KEY');
+      
+      let details;
+      try {
+        details = await extractEventDetailsFromImage(currentEvent.imageUrl, mimeType, storedApiKey);
+      } catch (err) {
+        if (err.message === 'API_KEY_MISSING') {
+          const key = prompt("Google Gemini API Key is missing (Production environment). Please enter your Gemini API Key:");
+          if (!key) throw new Error("API key was not provided. Scan cancelled.");
+          localStorage.setItem('BCC_GEMINI_API_KEY', key);
+          storedApiKey = key;
+          details = await extractEventDetailsFromImage(currentEvent.imageUrl, mimeType, storedApiKey);
+        } else {
+          throw err;
+        }
+      }
       
       setCurrentEvent(prev => ({
         ...prev,

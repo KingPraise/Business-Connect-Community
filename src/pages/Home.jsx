@@ -200,13 +200,15 @@ export default function Home() {
                   viewport={{ once: true, margin: "-100px" }}
                   className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                 >
-                  {filteredEvents.map(event => (
-                    <EventCard 
-                      key={event.id} 
-                      event={event} 
-                      onClick={setSelectedEvent} 
-                    />
-                  ))}
+                  <AnimatePresence>
+                    {filteredEvents.map(event => (
+                      <EventCard 
+                        key={event.id} 
+                        event={event} 
+                        onClick={setSelectedEvent} 
+                      />
+                    ))}
+                  </AnimatePresence>
                 </motion.div>
               )
             ) : (

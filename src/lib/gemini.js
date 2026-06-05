@@ -1,16 +1,16 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize the Gemini API with the Vite environment variable
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
+export async function extractEventDetailsFromImage(base64Image, mimeType, providedApiKey = null) {
+  const apiKey = providedApiKey || import.meta.env.VITE_GEMINI_API_KEY;
 
-export async function extractEventDetailsFromImage(base64Image, mimeType) {
-  if (!import.meta.env.VITE_GEMINI_API_KEY) {
-    throw new Error('VITE_GEMINI_API_KEY is missing from .env.local');
+  if (!apiKey) {
+    throw new Error('API_KEY_MISSING');
   }
 
   try {
-    // Use gemini-1.5-flash-latest as it is fast, supports multimodal input, and resolves the 404 error
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+    const genAI = new GoogleGenerativeAI(apiKey);
+    // Use gemini-flash-latest as it is fully supported by your API Key and supports multimodal input
+    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
     const prompt = `
       You are an expert event data extraction assistant.
@@ -34,7 +34,7 @@ export async function extractEventDetailsFromImage(base64Image, mimeType) {
         "organizerContact": "Email, phone or website of organizer",
         "tags": ["tag1", "tag2", "tag3"] (Generate 3 relevant lowercase tags)
       }
-    \`;
+    `;
 
     const imageParts = [
       {
@@ -51,8 +51,9 @@ export async function extractEventDetailsFromImage(base64Image, mimeType) {
     const cleanedText = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(cleanedText);
     
-    if (parsed.isEventFlyer === false) {
-      throw new Error(parsed.errorMessage || "The uploaded image does not appear to be an event flyer. Please upload a valid flyer.");
+    // Strict check: if the AI explicitly says it's not a flyer, or fails to include the flag, reject it.
+    if (!parsed.isEventFlyer || String(parsed.isEventFlyer).toLowerCase() === 'false') {
+      throw new Error(parsed.errorMessage || "The uploaded image does not appear to be a valid event flyer. Please upload an image containing event details.");
     }
     
     return parsed;
