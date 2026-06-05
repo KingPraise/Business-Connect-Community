@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, ChevronDown, MapPin, Tag, Banknote } from 'lucide-react';
+import { Search, ChevronDown, MapPin, Tag, Banknote, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const CATEGORIES = ["All", "Networking", "Business", "Creative", "Community", "Social"];
@@ -87,11 +87,26 @@ export default function FilterBar({
           </div>
           <input
             type="text"
-            className="block w-full pl-14 pr-5 py-4 border border-white/10 rounded-2xl leading-5 bg-white/5 text-white placeholder-gray-500 focus:outline-none focus:border-bcc-yellow/40 focus:bg-white/10 focus:ring-4 focus:ring-bcc-yellow/10 transition-all duration-300 text-base font-medium shadow-inner"
+            className="block w-full pl-14 pr-12 py-4 border border-white/10 rounded-2xl leading-5 bg-white/5 text-white placeholder-gray-500 focus:outline-none focus:border-bcc-yellow/40 focus:bg-white/10 focus:ring-4 focus:ring-bcc-yellow/10 transition-all duration-300 text-base font-medium shadow-inner"
             placeholder="Search for incredible events..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
+          <AnimatePresence>
+            {searchQuery && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                onClick={() => setSearchQuery('')}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
+              >
+                <div className="p-1 bg-white/10 hover:bg-white/20 rounded-full">
+                  <X className="w-4 h-4" />
+                </div>
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Filters */}

@@ -56,3 +56,21 @@
 .animation-delay-4000 {
   animation-delay: 4s;
 }
+
+/* Leaflet Customizations */
+.leaflet-popup-content-wrapper {
+  background: white;
+  color: #0a0f1c;
+  border-radius: 1rem;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.leaflet-popup-content {
+  margin: 12px;
+}
+
+.leaflet-popup-tip {
+  background: white;
+}

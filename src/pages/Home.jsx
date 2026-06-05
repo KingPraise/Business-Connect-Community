@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
+import { Map, LayoutGrid } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import FilterBar from '../components/FilterBar';
@@ -10,9 +12,11 @@ import EventCardSkeleton from '../components/EventCardSkeleton';
 import ParticleBackground from '../components/ParticleBackground';
 import SponsorMarquee from '../components/SponsorMarquee';
 import HeroSlider from '../components/HeroSlider';
+import EventMap from '../components/EventMap';
 
 export default function Home() {
   const { events, loading } = useEvents();
+  const [isMapView, setIsMapView] = useState(false);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -41,9 +45,9 @@ export default function Home() {
     return events.filter(event => {
       // Search
       const matchesSearch = 
-        event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+        (event.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (event.description || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (event.tags || []).some(tag => (tag || '').toLowerCase().includes(searchQuery.toLowerCase()));
       
       // Category
       const matchesCategory = selectedCategory === 'All' || event.category === selectedCategory;
@@ -62,6 +66,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>Business Connect Community | Ibadan Events & Networking</title>
+        <meta name="description" content="Discover the best professional networking, creative, and business events happening in Ibadan. Find opportunities and grow your community." />
+      </Helmet>
       <Header />
       
       <main className="flex-grow">
@@ -148,13 +156,31 @@ export default function Home() {
           />
 
           <div className="mt-16">
-            <div className="flex justify-between items-end mb-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4">
               <h2 className="text-3xl font-display font-bold text-white">
                 Upcoming Events
               </h2>
-              <span className="text-bcc-muted font-medium">
-                {filteredEvents.length} {filteredEvents.length === 1 ? 'event' : 'events'} found
-              </span>
+              <div className="flex items-center gap-4">
+                <span className="text-bcc-muted font-medium">
+                  {filteredEvents.length} {filteredEvents.length === 1 ? 'event' : 'events'} found
+                </span>
+                <div className="flex bg-white/5 p-1 rounded-lg border border-white/10">
+                  <button
+                    onClick={() => setIsMapView(false)}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${!isMapView ? 'bg-bcc-yellow text-bcc-dark shadow-md' : 'text-gray-400 hover:text-white'}`}
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                    <span className="hidden sm:inline">List</span>
+                  </button>
+                  <button
+                    onClick={() => setIsMapView(true)}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${isMapView ? 'bg-bcc-yellow text-bcc-dark shadow-md' : 'text-gray-400 hover:text-white'}`}
+                  >
+                    <Map className="w-4 h-4" />
+                    <span className="hidden sm:inline">Map</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             {loading ? (
@@ -164,21 +190,25 @@ export default function Home() {
                 ))}
               </div>
             ) : filteredEvents.length > 0 ? (
-              <motion.div 
-                variants={containerVariants}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, margin: "-100px" }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-              >
-                {filteredEvents.map(event => (
-                  <EventCard 
-                    key={event.id} 
-                    event={event} 
-                    onClick={setSelectedEvent} 
-                  />
-                ))}
-              </motion.div>
+              isMapView ? (
+                <EventMap events={filteredEvents} onEventClick={setSelectedEvent} />
+              ) : (
+                <motion.div 
+                  variants={containerVariants}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, margin: "-100px" }}
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                >
+                  {filteredEvents.map(event => (
+                    <EventCard 
+                      key={event.id} 
+                      event={event} 
+                      onClick={setSelectedEvent} 
+                    />
+                  ))}
+                </motion.div>
+              )
             ) : (
               <div className="text-center py-20 bg-bcc-card/50 rounded-3xl border border-white/5">
                 <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">

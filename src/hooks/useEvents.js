@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { initialEvents } from '../data/mockEvents';
 
-const STORAGE_KEY = 'bcc_events';
+const STORAGE_KEY = 'bcc_events_v2';
 
 export function useEvents() {
   const [events, setEvents] = useState([]);

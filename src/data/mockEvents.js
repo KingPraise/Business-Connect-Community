@@ -1,48 +1,98 @@
 export const initialEvents = [
   {
-    id: "evt-001",
-    name: "Ibadan Tech Meetup 2026",
-    imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
-    date: "2026-06-15T10:00:00+01:00",
+    id: "evt-006",
+    name: "Shift - turning efforts into results",
+    imageUrl: "/media__1780635304422.png",
+    date: "2026-06-13T10:00:00+01:00",
     location: {
-      address: "Hub360, 2nd Floor",
-      area: "Ring Road"
+      address: "Global Harvest Church, 3-5 Harvesters' Drive, Liberty Road, Ibadan",
+      area: "Liberty Road",
+      coordinates: [7.3592, 3.8647]
     },
-    category: "Networking",
+    category: "Business",
     price: {
       type: "Free",
       amount: 0
     },
-    description: "A networking event bringing together the brightest minds in Ibadan's tech ecosystem.",
+    description: "A transformative session on turning your efforts into tangible results. Speakers: Michael Ebadan, Oluwakemisola Ilori, Opeyemi Folorunso.",
     organizer: {
-      name: "Ibadan Tech Connect",
-      contact: "hello@ibadantech.com"
+      name: "HRDM / The Lead",
+      contact: "info@globalharvest.org"
     },
-    rsvpLink: "https://eventbrite.com/example-tech",
-    tags: ["tech", "startup", "networking"],
+    rsvpLink: "https://bit.ly/TheLead2026",
+    tags: ["business", "growth", "results"],
     featured: true
   },
   {
-    id: "evt-002",
-    name: "Oyo Business Conference",
-    imageUrl: "https://images.unsplash.com/photo-1591115765373-5207764f72e7?w=800",
-    date: "2026-07-02T09:00:00+01:00",
+    id: "evt-007",
+    name: "Sing, Sip & Play",
+    imageUrl: "/media__1780635311093.jpg",
+    date: "2026-06-19T18:00:00+01:00",
     location: {
-      address: "International Conference Centre",
-      area: "UI"
+      address: "Cafe One Iwo Road, 49A, Sterling Bank Building, Abayomi Junction, Iwo Road, Ibadan",
+      area: "Iwo Road",
+      coordinates: [7.3995, 3.9312]
     },
-    category: "Business",
+    category: "Social",
     price: {
       type: "Paid",
       amount: 5000
     },
-    description: "Annual business conference focusing on local enterprise growth.",
+    description: "An evening of painting, singing, sipping, and playing. Perfect for unwinding and networking in a relaxed atmosphere.",
     organizer: {
-      name: "Oyo State Enterprise Board",
-      contact: "info@oyobusiness.com"
+      name: "Café One",
+      contact: "info@cafeone.ng"
     },
-    rsvpLink: "https://eventbrite.com/example-biz",
-    tags: ["business", "finance", "leadership"],
+    rsvpLink: "#",
+    tags: ["social", "creative", "networking"],
+    featured: true
+  },
+  {
+    id: "evt-001",
+    name: "Ibadan Tech Expo 2026",
+    imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
+    date: "2026-06-15T09:00:00+01:00",
+    location: {
+      address: "University of Ibadan Conference Centre",
+      area: "Bodija",
+      coordinates: [7.4443, 3.8995]
+    },
+    category: "Tech",
+    price: {
+      type: "Paid",
+      amount: 5000
+    },
+    description: "The largest tech gathering in Oyo State.",
+    organizer: {
+      name: "Ibadan Tech Hub",
+      contact: "info@ibadantech.com"
+    },
+    rsvpLink: "https://eventbrite.com/example-tech",
+    tags: ["tech", "startup", "innovation"],
+    featured: true
+  },
+  {
+    id: "evt-002",
+    name: "SME Networking Breakfast",
+    imageUrl: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=800",
+    date: "2026-06-18T08:30:00+01:00",
+    location: {
+      address: "Golden Tulip",
+      area: "Jericho",
+      coordinates: [7.3881, 3.8644]
+    },
+    category: "Business",
+    price: {
+      type: "Free",
+      amount: 0
+    },
+    description: "A morning of networking for small and medium enterprise owners.",
+    organizer: {
+      name: "SME Forum",
+      contact: "hello@smeforum.ng"
+    },
+    rsvpLink: "https://eventbrite.com/example-sme",
+    tags: ["business", "networking", "sme"],
     featured: false
   },
   {
@@ -52,7 +102,8 @@ export const initialEvents = [
     date: "2026-06-20T16:00:00+01:00",
     location: {
       address: "Palms Mall",
-      area: "Ring Road"
+      area: "Ring Road",
+      coordinates: [7.3514, 3.8741]
     },
     category: "Creative",
     price: {
@@ -75,7 +126,8 @@ export const initialEvents = [
     date: "2026-06-25T11:00:00+01:00",
     location: {
       address: "Jogor Centre",
-      area: "Liberty Road"
+      area: "Liberty Road",
+      coordinates: [7.3621, 3.8644]
     },
     category: "Community",
     price: {
@@ -98,7 +150,8 @@ export const initialEvents = [
     date: "2026-07-15T18:00:00+01:00",
     location: {
       address: "Trans-Amusement Park",
-      area: "Bodija"
+      area: "Bodija",
+      coordinates: [7.4299, 3.9056]
     },
     category: "Social",
     price: {
@@ -115,13 +168,14 @@ export const initialEvents = [
     featured: true
   },
   {
-    id: "evt-006",
+    id: "evt-008",
     name: "Finance and Investment Seminar",
     imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800",
     date: "2026-06-28T10:00:00+01:00",
     location: {
       address: "Cocoa House, 5th Floor",
-      area: "Dugbe"
+      area: "Dugbe",
+      coordinates: [7.3871, 3.8732]
     },
     category: "Business",
     price: {

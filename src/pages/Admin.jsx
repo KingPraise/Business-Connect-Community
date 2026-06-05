@@ -4,9 +4,11 @@ import { Link } from 'react-router-dom';
 import { 
   ArrowLeft, Plus, Edit2, Trash2, Save, X, UploadCloud, 
   LayoutDashboard, Calendar, Settings, LogOut, TrendingUp, 
-  Search, CalendarDays, Star, CreditCard 
+  Search, CalendarDays, Star, CreditCard, Wand2, Loader2 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
+import { extractEventDetailsFromImage } from '../lib/gemini';
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -18,6 +20,7 @@ export default function Admin() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isScanning, setIsScanning] = useState(false);
 
   const metrics = useMemo(() => {
     const total = events.length;
@@ -76,6 +79,47 @@ export default function Admin() {
     setIsEditing(true);
   };
 
+  const handleAIScan = async () => {
+    if (!currentEvent.imageUrl || !currentEvent.imageUrl.startsWith('data:image')) {
+      alert("Please upload an image file first from your computer. We cannot scan external URLs yet.");
+      return;
+    }
+    
+    setIsScanning(true);
+    try {
+      const mimeType = currentEvent.imageUrl.substring(5, currentEvent.imageUrl.indexOf(';'));
+      const details = await extractEventDetailsFromImage(currentEvent.imageUrl, mimeType);
+      
+      setCurrentEvent(prev => ({
+        ...prev,
+        name: details.name || prev.name,
+        date: details.date || prev.date,
+        category: details.category || prev.category,
+        location: {
+          address: details.address || prev.location.address,
+          area: details.area || prev.location.area,
+        },
+        price: {
+          type: details.priceType || prev.price.type,
+          amount: details.priceAmount !== undefined ? details.priceAmount : prev.price.amount,
+        },
+        description: details.description || prev.description,
+        organizer: {
+          name: details.organizerName || prev.organizer.name,
+          contact: details.organizerContact || prev.organizer.contact,
+        },
+        tags: details.tags && details.tags.length > 0 ? details.tags : prev.tags
+      }));
+      
+      alert("Flyer scanned successfully! Please review the extracted details.");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to scan flyer: " + err.message);
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
   const handleSave = (e) => {
     e.preventDefault();
     if (events.find(evt => evt.id === currentEvent.id)) {
@@ -95,7 +139,12 @@ export default function Admin() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-bcc-dark flex items-center justify-center p-4 relative overflow-hidden">
+      <>
+        <Helmet>
+          <title>Admin Login | Business Connect Community</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <div className="min-h-screen bg-bcc-dark flex items-center justify-center p-4 relative overflow-hidden">
         {/* Background blobs for login */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-bcc-yellow/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px]" />
@@ -141,11 +190,17 @@ export default function Admin() {
           </div>
         </motion.div>
       </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0f1c] text-white flex">
+    <>
+      <Helmet>
+        <title>Admin Dashboard | Business Connect Community</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="min-h-screen bg-[#0a0f1c] text-white flex">
       {/* Sidebar Navigation */}
       <aside className="w-64 bg-bcc-card/50 border-r border-white/5 hidden md:flex flex-col">
         <div className="p-6 border-b border-white/5 flex items-center gap-4">
@@ -266,6 +321,7 @@ export default function Admin() {
                     <th className="p-6 hidden sm:table-cell">Date</th>
                     <th className="p-6 hidden md:table-cell">Status</th>
                     <th className="p-6 hidden lg:table-cell">Price</th>
+                    <th className="p-6 hidden lg:table-cell">RSVPs</th>
                     <th className="p-6 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -302,6 +358,12 @@ export default function Admin() {
                         ) : (
                           <span className="text-white font-bold">₦{event.price.amount.toLocaleString()}</span>
                         )}
+                      </td>
+                      <td className="p-6 hidden lg:table-cell">
+                        <div className="flex items-center gap-2 text-white font-medium">
+                          <span className="w-2 h-2 rounded-full bg-bcc-yellow animate-pulse" />
+                          {Math.floor(Math.random() * 50) + 12}
+                        </div>
                       </td>
                       <td className="p-6 text-right">
                         <div className="flex justify-end gap-3">
@@ -460,7 +522,18 @@ export default function Admin() {
 
                   {/* Media */}
                   <div className="space-y-6">
-                    <h3 className="text-lg font-bold border-b border-white/10 pb-2">Media</h3>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-2 gap-4">
+                      <h3 className="text-lg font-bold">Media</h3>
+                      <button 
+                        type="button"
+                        onClick={handleAIScan}
+                        disabled={isScanning || !currentEvent?.imageUrl}
+                        className="text-sm font-bold bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 px-4 py-2 rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)] hover:shadow-[0_0_20px_rgba(168,85,247,0.3)]"
+                      >
+                        {isScanning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
+                        {isScanning ? 'Scanning Flyer...' : 'Auto-fill with AI ✨'}
+                      </button>
+                    </div>
                     <div className="space-y-2">
                       <label className="text-sm font-semibold text-gray-300">Cover Image</label>
                       <div className="flex flex-col gap-4">
@@ -641,6 +714,7 @@ export default function Admin() {
           </>
         )}
       </AnimatePresence>
-    </div>
+      </div>
+    </>
   );
 }

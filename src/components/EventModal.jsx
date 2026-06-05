@@ -1,7 +1,11 @@
-import { X, MapPin, Calendar, ExternalLink, User, Tag } from 'lucide-react';
+import { X, MapPin, Calendar, ExternalLink, User, Tag, Ticket } from 'lucide-react';
+import { useState } from 'react';
 import { CategoryBadge, PricePill } from './EventCard';
+import { useAuth } from '../hooks/useAuth';
 
 export default function EventModal({ event, onClose }) {
+  const { user } = useAuth();
+  const [rsvpStatus, setRsvpStatus] = useState('idle'); // 'idle', 'loading', 'success'
   if (!event) return null;
 
   const dateObj = new Date(event.date);
@@ -113,16 +117,26 @@ export default function EventModal({ event, onClose }) {
           </div>
 
           {/* CTA */}
-          <div className="mt-auto flex justify-end">
-            <a 
-              href={event.rsvpLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-bcc-yellow text-bcc-dark px-8 py-4 rounded-xl font-bold text-lg hover:bg-yellow-400 transition-colors shadow-[0_4px_20px_rgba(245,197,24,0.3)] hover:-translate-y-1 inline-flex items-center gap-2"
+          <div className="mt-auto flex justify-end items-center gap-4">
+            {rsvpStatus === 'success' && (
+              <span className="text-green-400 font-medium flex items-center gap-2">
+                <Ticket className="w-5 h-5" /> RSVP Successful!
+              </span>
+            )}
+            <button 
+              onClick={() => {
+                if (!user) {
+                  alert("Please log in to RSVP for this event.");
+                  return;
+                }
+                setRsvpStatus('loading');
+                setTimeout(() => setRsvpStatus('success'), 1000);
+              }}
+              disabled={rsvpStatus === 'loading' || rsvpStatus === 'success'}
+              className="bg-bcc-yellow text-bcc-dark px-8 py-4 rounded-xl font-bold text-lg hover:bg-yellow-400 transition-colors shadow-[0_4px_20px_rgba(245,197,24,0.3)] hover:-translate-y-1 inline-flex items-center gap-2 disabled:opacity-50 disabled:hover:translate-y-0"
             >
-              {event.price.type === 'Free' ? 'Register Now' : 'Get Tickets'}
-              <ExternalLink className="w-5 h-5" />
-            </a>
+              {rsvpStatus === 'loading' ? 'Processing...' : rsvpStatus === 'success' ? 'Ticket Secured' : (event.price.type === 'Free' ? 'Register Now' : 'Get Tickets')}
+            </button>
           </div>
         </div>
       </div>

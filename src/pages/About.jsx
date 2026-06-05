@@ -2,6 +2,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Target, Users, Settings, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -42,9 +43,13 @@ export default function About() {
 
   return (
     <div className="min-h-screen flex flex-col bg-bcc-dark text-white">
+      <Helmet>
+        <title>About Us | Business Connect Community</title>
+        <meta name="description" content="Learn about Business Connect Community, Ibadan's premier ecosystem for ambitious professionals. Explore our pillars: peer partnerships, resource leverage, and capacity building." />
+      </Helmet>
       <Header />
       
-      <main className="flex-grow">
+      <main className="flex-grow pt-10">
         {/* Hero Section */}
         <section className="relative pt-20 pb-24 overflow-hidden border-b border-white/5">
           <div className="absolute inset-0 bg-gradient-to-b from-bcc-yellow/5 to-transparent z-0" />
