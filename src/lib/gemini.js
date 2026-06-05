@@ -9,8 +9,8 @@ export async function extractEventDetailsFromImage(base64Image, mimeType) {
   }
 
   try {
-    // Use gemini-1.5-flash as it is fast and supports multimodal input
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Use gemini-1.5-flash-latest as it is fast, supports multimodal input, and resolves the 404 error
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
     const prompt = `
       You are an expert event data extraction assistant.
@@ -20,6 +20,8 @@ export async function extractEventDetailsFromImage(base64Image, mimeType) {
 
       Required JSON structure:
       {
+        "isEventFlyer": true/false, // MUST be true if the image is an event flyer, false otherwise
+        "errorMessage": "If isEventFlyer is false, provide a short 1-sentence reason why",
         "name": "Event Title",
         "date": "YYYY-MM-DDT12:00:00+01:00", (Extract date and time and format as ISO string, assume current year if missing, timezone +01:00)
         "category": "One of: Networking, Business, Creative, Community, Social", (Choose the best fit)
@@ -32,12 +34,12 @@ export async function extractEventDetailsFromImage(base64Image, mimeType) {
         "organizerContact": "Email, phone or website of organizer",
         "tags": ["tag1", "tag2", "tag3"] (Generate 3 relevant lowercase tags)
       }
-    `;
+    \`;
 
     const imageParts = [
       {
         inlineData: {
-          data: base64Image.split(',')[1], // Remove the data:image/jpeg;base64, prefix
+          data: base64Image.split(',')[1],
           mimeType
         }
       }
@@ -46,10 +48,14 @@ export async function extractEventDetailsFromImage(base64Image, mimeType) {
     const result = await model.generateContent([prompt, ...imageParts]);
     const responseText = result.response.text();
     
-    // Clean up potential markdown formatting if the model disobeys instructions
     const cleanedText = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
+    const parsed = JSON.parse(cleanedText);
     
-    return JSON.parse(cleanedText);
+    if (parsed.isEventFlyer === false) {
+      throw new Error(parsed.errorMessage || "The uploaded image does not appear to be an event flyer. Please upload a valid flyer.");
+    }
+    
+    return parsed;
   } catch (error) {
     console.error("Gemini Extraction Error:", error);
     throw error;
