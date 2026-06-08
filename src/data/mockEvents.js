@@ -1,5 +1,89 @@
 export const initialEvents = [
   {
+    id: "evt-010",
+    name: "Eve's Lounge 3.0 Annual Live Convening (Panel 2)",
+    theme: "The Liberated Woman: Power, Voice and Choices",
+    panelTopic: "INFLUENCE BEYOND POLITICS - WOMEN LEADING CHANGE ACROSS SECTORS",
+    imageUrl: "/media__1780635311093.jpg", // Placeholder
+    date: "2026-06-19T11:00:00+01:00",
+    location: {
+      address: "Mauve 21",
+      area: "Ringroad",
+      coordinates: [7.3514, 3.8741]
+    },
+    category: "Business",
+    price: {
+      type: "Free",
+      amount: 0
+    },
+    description: "Annual live convening bringing together powerful women. This panel focuses on women leading change across various sectors beyond politics.",
+    organizer: {
+      name: "DAMSTAR Media & Communications",
+      contact: "damstarmedia@gmail.com"
+    },
+    rsvpLink: "www.damstarmedia.com",
+    tags: ["women", "leadership", "influence", "change"],
+    featured: true,
+    speakers: [
+      { name: "Oluwafunmilayo Alex Oni", role: "Moderator" },
+      { name: "Ànìkéádé Fúnké-Treasure", role: "Speaker" },
+      { name: "Oluwakemi Irinoye", role: "Speaker" },
+      { name: "Aduragbemi Euba", role: "Speaker" },
+      { name: "Barr. Titi Asabia", role: "Speaker" }
+    ],
+    sponsors: [
+      { name: "Akmodel Group" },
+      { name: "AWM (African Women in Media)" },
+      { name: "DAWN Commission" },
+      { name: "FanMilk" },
+      { name: "Golden Penny Foods" },
+      { name: "HACEY" },
+      { name: "Dataphyte" }
+    ]
+  },
+  {
+    id: "evt-009",
+    name: "Eve's Lounge 3.0 Annual Live Convening",
+    theme: "The Liberated Woman: Power, Voice and Choices",
+    panelTopic: "The Woman - Representation, Legitimacy & Political Power",
+    imageUrl: "/media__1780635311093.jpg", // We will use this placeholder or the user's uploaded image if they provide a path. For now, use a generic one or one from the repo. Let's use the actual poster if possible, but we don't have its path. Let's use the provided URL or a placeholder. Wait, I see media__1780635311093.jpg in another event. Let's just use a placeholder from unsplash.
+    date: "2026-06-19T11:00:00+01:00",
+    location: {
+      address: "Mauve 21",
+      area: "Ringroad",
+      coordinates: [7.3514, 3.8741]
+    },
+    category: "Business",
+    price: {
+      type: "Free",
+      amount: 0
+    },
+    description: "Annual live convening bringing together powerful women for insightful panel sessions on representation, legitimacy, and political power.",
+    organizer: {
+      name: "DAMSTAR Media & Communications",
+      contact: "damstarmedia@gmail.com"
+    },
+    rsvpLink: "www.damstarmedia.com",
+    tags: ["women", "leadership", "power", "politics"],
+    featured: true,
+    speakers: [
+      { name: "Dr. Oreoluwa Aladejuyigbe", role: "Moderator" },
+      { name: "Hon. Tolu Akande-Sadipe", role: "Speaker" },
+      { name: "Hon. Olufunke Comforter Olajide", role: "Speaker" },
+      { name: "Princess Islamiyat Oyefusi", role: "Speaker" },
+      { name: "Dr. Olamide Junaid", role: "Speaker" }
+    ],
+    sponsors: [
+      { name: "Akmodel Group" },
+      { name: "AWM (African Women in Media)" },
+      { name: "DAWN Commission" },
+      { name: "FanMilk" },
+      { name: "Golden Penny Foods" },
+      { name: "HACEY" },
+      { name: "Dataphyte" }
+    ]
+  },
+  {
     id: "evt-006",
     name: "Shift - turning efforts into results",
     imageUrl: "/media__1780635304422.png",

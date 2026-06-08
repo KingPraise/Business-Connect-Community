@@ -50,9 +50,19 @@ export default function EventModal({ event, onClose }) {
             )}
           </div>
 
-          <h2 className="text-3xl sm:text-4xl font-display font-bold text-white mb-6">
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-white mb-2">
             {event.name}
           </h2>
+          {event.theme && (
+            <h3 className="text-xl sm:text-2xl font-display text-bcc-yellow mb-2">
+              Theme: {event.theme}
+            </h3>
+          )}
+          {event.panelTopic && (
+            <h4 className="text-lg font-display text-white/90 mb-6 italic">
+              Panel: {event.panelTopic}
+            </h4>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 bg-bcc-dark/50 rounded-2xl p-6 border border-white/5">
             <div className="flex items-start gap-4">
@@ -88,6 +98,36 @@ export default function EventModal({ event, onClose }) {
               <p className="whitespace-pre-wrap">{event.description}</p>
             </div>
           </div>
+
+          {event.speakers && event.speakers.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-xl font-display font-bold text-white mb-4">Speakers & Panelists</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {event.speakers.map((speaker, idx) => (
+                  <div key={idx} className="bg-bcc-dark/40 p-3 rounded-xl border border-white/5 flex flex-col items-center text-center">
+                    <div className="w-12 h-12 rounded-full bg-bcc-yellow/20 flex items-center justify-center mb-2">
+                      <User className="w-6 h-6 text-bcc-yellow" />
+                    </div>
+                    <p className="text-sm font-medium text-white">{speaker.name}</p>
+                    <p className="text-xs text-bcc-muted mt-1">{speaker.role}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {event.sponsors && event.sponsors.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-xl font-display font-bold text-white mb-4">Our Sponsors</h3>
+              <div className="flex flex-wrap gap-3">
+                {event.sponsors.map((sponsor, idx) => (
+                  <div key={idx} className="bg-white/5 px-4 py-2 rounded-lg border border-white/10">
+                    <p className="text-sm text-white/80 font-medium">{sponsor.name}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 pb-8 border-b border-white/10">
             <div>

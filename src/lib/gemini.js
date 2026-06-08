@@ -9,8 +9,14 @@ export async function extractEventDetailsFromImage(base64Image, mimeType, provid
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // Use gemini-flash-latest as it is fully supported by your API Key and supports multimodal input
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    
+    // Define a list of models to try in order of preference
+    const fallbackModels = [
+      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+      "gemini-flash-latest",
+      "gemini-2.5-pro"
+    ];
 
     const prompt = `
       You are an expert event data extraction assistant.
@@ -45,18 +51,38 @@ export async function extractEventDetailsFromImage(base64Image, mimeType, provid
       }
     ];
 
-    const result = await model.generateContent([prompt, ...imageParts]);
-    const responseText = result.response.text();
-    
-    const cleanedText = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
-    const parsed = JSON.parse(cleanedText);
-    
-    // Strict check: if the AI explicitly says it's not a flyer, or fails to include the flag, reject it.
-    if (!parsed.isEventFlyer || String(parsed.isEventFlyer).toLowerCase() === 'false') {
-      throw new Error(parsed.errorMessage || "The uploaded image does not appear to be a valid event flyer. Please upload an image containing event details.");
+    let lastError = null;
+
+    for (const modelName of fallbackModels) {
+      try {
+        console.log(`Attempting Gemini extraction using model: ${modelName}`);
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent([prompt, ...imageParts]);
+        const responseText = result.response.text();
+        
+        const cleanedText = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
+        const parsed = JSON.parse(cleanedText);
+        
+        // Strict check: if the AI explicitly says it's not a flyer, or fails to include the flag, reject it.
+        if (!parsed.isEventFlyer || String(parsed.isEventFlyer).toLowerCase() === 'false') {
+          throw new Error(parsed.errorMessage || "The uploaded image does not appear to be a valid event flyer. Please upload an image containing event details.");
+        }
+        
+        return parsed;
+      } catch (err) {
+        console.warn(`Model ${modelName} failed:`, err.message);
+        lastError = err;
+        
+        // If it's a 404 or 503, continue to the next fallback model.
+        // If it's our custom validation error (not an event flyer), don't retry, throw immediately!
+        if (err.message.includes("does not appear to be a valid event flyer") || err.message.includes("isEventFlyer is false")) {
+          throw err;
+        }
+      }
     }
-    
-    return parsed;
+
+    // If all models failed
+    throw new Error(`All available Gemini models failed. Last error: ${lastError.message}`);
   } catch (error) {
     console.error("Gemini Extraction Error:", error);
     throw error;

@@ -70,14 +70,26 @@ export default function EventCard({ event, onClick }) {
   };
 
   return (
-    <motion.div 
-      variants={item}
-      style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      onClick={() => onClick(event)}
-      className="group bg-bcc-card rounded-2xl overflow-hidden border border-white/5 hover:border-bcc-yellow/50 transition-colors duration-300 cursor-pointer hover:shadow-[0_0_30px_rgba(245,197,24,0.15)] flex flex-col h-full relative z-10"
-    >
+    <div style={{ perspective: "1000px" }} className="h-full">
+      <motion.div 
+        variants={item}
+        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        onClick={() => onClick(event)}
+        className="group bg-bcc-card rounded-2xl overflow-hidden border border-white/5 hover:border-bcc-yellow/50 transition-colors duration-300 cursor-pointer flex flex-col h-full relative z-10"
+      >
+        {/* Dynamic Glow based on mouse position */}
+        <motion.div 
+          className="absolute inset-0 z-50 pointer-events-none rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          style={{
+            background: useTransform(() => {
+              const xPos = (x.get() + 0.5) * 100;
+              const yPos = (y.get() + 0.5) * 100;
+              return `radial-gradient(circle at ${xPos}% ${yPos}%, rgba(245,197,24,0.15) 0%, transparent 60%)`;
+            })
+          }}
+        />
       <div className="relative h-48 w-full overflow-hidden" style={{ transform: "translateZ(30px)" }}>
         <img 
           src={event.imageUrl} 
@@ -111,11 +123,16 @@ export default function EventCard({ event, onClick }) {
           <PricePill price={event.price} />
         </div>
         
-        <h3 className="font-display text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-bcc-yellow transition-colors group-hover:glow-text">
+        <h3 className="font-display text-xl font-bold text-white mb-1 line-clamp-2 group-hover:text-bcc-yellow transition-colors group-hover:glow-text">
           {event.name}
         </h3>
+        {event.theme && (
+          <p className="text-bcc-yellow text-xs font-medium mb-2 line-clamp-1 italic">
+            Theme: {event.theme}
+          </p>
+        )}
         
-        <div className="mt-auto pt-4 space-y-2">
+        <div className="mt-auto pt-2 space-y-2">
           <div className="flex items-center text-bcc-muted text-sm gap-2">
             <CalendarIcon className="w-4 h-4 text-bcc-yellow/70 shrink-0" />
             <span className="truncate">
@@ -129,5 +146,6 @@ export default function EventCard({ event, onClick }) {
         </div>
       </div>
     </motion.div>
+    </div>
   );
 }

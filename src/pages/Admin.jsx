@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import { Link } from 'react-router-dom';
 import { 
@@ -8,12 +8,18 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
+import { toast } from 'sonner';
 import { extractEventDetailsFromImage } from '../lib/gemini';
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
+  const [themeColor, setThemeColor] = useState(localStorage.getItem('bcc_theme_color') || '#f5c518');
+  
+  useEffect(() => {
+    document.documentElement.style.setProperty('--bcc-yellow', themeColor);
+  }, [themeColor]);
   
   const { events, addEvent, updateEvent, deleteEvent } = useEvents();
   
@@ -36,8 +42,9 @@ export default function Admin() {
     e.preventDefault();
     if (password === 'admin123') {
       setIsAuthenticated(true);
+      toast.success('Login successful!');
     } else {
-      alert('Incorrect password. Try "admin123"');
+      toast.error('Incorrect password. Try "admin123"');
     }
   };
 
@@ -50,7 +57,7 @@ export default function Admin() {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 10 * 1024 * 1024) {
-        alert("File is too large. Please select an image under 10MB.");
+        toast.error("File is too large. Please select an image under 10MB.");
         return;
       }
       const reader = new FileReader();
@@ -110,7 +117,7 @@ export default function Admin() {
 
   const handleAIScan = async () => {
     if (!currentEvent.imageUrl || !currentEvent.imageUrl.startsWith('data:image')) {
-      alert("Please upload an image file first from your computer. We cannot scan external URLs yet.");
+      toast.error("Please upload an image file first from your computer. We cannot scan external URLs yet.");
       return;
     }
     
@@ -154,11 +161,10 @@ export default function Admin() {
         },
         tags: details.tags && details.tags.length > 0 ? details.tags : prev.tags
       }));
-      
-      alert("Flyer scanned successfully! Please review the extracted details.");
+      toast.success("Flyer scanned successfully! Please review the extracted details.");
     } catch (err) {
       console.error(err);
-      alert("Failed to scan flyer: " + err.message);
+      toast.error("Failed to scan flyer: " + err.message);
     } finally {
       setIsScanning(false);
     }
@@ -244,7 +250,7 @@ export default function Admin() {
         <title>Admin Dashboard | Business Connect Community</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
-      <div className="min-h-screen bg-[#0a0f1c] text-white flex">
+      <div className="min-h-screen bg-bcc-dark text-white flex">
       {/* Sidebar Navigation */}
       <aside className="w-64 bg-bcc-card/50 border-r border-white/5 hidden md:flex flex-col">
         <div className="p-6 border-b border-white/5 flex items-center gap-4">
@@ -333,7 +339,28 @@ export default function Admin() {
             </div>
           )}
 
-          {(activeTab === 'dashboard' || activeTab === 'events') && (
+          {activeTab === 'dashboard' && (
+            <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 shadow-2xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold font-display">Recent Events</h2>
+                <button onClick={() => setActiveTab('events')} className="text-bcc-yellow hover:underline text-sm font-medium">View All</button>
+              </div>
+              <div className="space-y-4">
+                {events.slice(0, 3).map(event => (
+                  <div key={event.id} className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <img src={event.imageUrl} className="w-16 h-16 rounded-xl object-cover" alt="" />
+                    <div className="flex-1">
+                      <h3 className="font-bold text-white">{event.name}</h3>
+                      <p className="text-sm text-gray-400">{new Date(event.date).toLocaleDateString()}</p>
+                    </div>
+                    <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-bold text-gray-300">{event.category}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'events' && (
             <>
           {/* Table Toolbar */}
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
@@ -453,32 +480,62 @@ export default function Admin() {
               <p className="text-gray-400 text-lg mb-8">Configure your workspace preferences and user access limits.</p>
               
               <div className="space-y-6">
-                <div className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+                <div className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10">
                   <div>
-                    <h3 className="font-bold text-white text-lg">Dark Mode</h3>
-                    <p className="text-sm text-gray-400 mt-1">Force dark appearance across the dashboard</p>
+                    <h3 className="font-bold text-white text-lg">Theme Accent Color</h3>
+                    <p className="text-sm text-gray-400 mt-1">Change the primary brand color across the platform.</p>
                   </div>
-                  <div className="w-14 h-7 bg-bcc-yellow rounded-full relative cursor-pointer shadow-[0_0_15px_rgba(245,197,24,0.3)]">
-                    <div className="w-6 h-6 bg-bcc-dark rounded-full absolute right-0.5 top-0.5" />
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 opacity-50 cursor-not-allowed">
-                  <div>
-                    <h3 className="font-bold text-white text-lg">Email Notifications</h3>
-                    <p className="text-sm text-gray-400 mt-1">Get alerts for new event RSVPs (Coming Soon)</p>
-                  </div>
-                  <div className="w-14 h-7 bg-gray-600 rounded-full relative">
-                    <div className="w-6 h-6 bg-gray-400 rounded-full absolute left-0.5 top-0.5" />
+                  <div className="flex items-center gap-3">
+                    {['#f5c518', '#3b82f6', '#8b5cf6', '#10b981', '#f43f5e'].map(color => (
+                      <button 
+                        key={color}
+                        onClick={() => {
+                          setThemeColor(color);
+                          localStorage.setItem('bcc_theme_color', color);
+                        }}
+                        className={`w-8 h-8 rounded-full border-2 transition-all ${themeColor === color ? 'border-white scale-110' : 'border-transparent hover:scale-105'}`}
+                        style={{ backgroundColor: color }}
+                        title={color}
+                      />
+                    ))}
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 opacity-50 cursor-not-allowed">
+                <div className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10">
                   <div>
-                    <h3 className="font-bold text-white text-lg">Export Data</h3>
-                    <p className="text-sm text-gray-400 mt-1">Download all event records as CSV (Coming Soon)</p>
+                    <h3 className="font-bold text-white text-lg">AI API Key Management</h3>
+                    <p className="text-sm text-gray-400 mt-1">Manage your Gemini API Key for the Event Flyer Autofill feature.</p>
                   </div>
-                  <button className="px-4 py-2 rounded-xl bg-white/10 font-bold text-gray-400">Export</button>
+                  <button 
+                    onClick={() => {
+                      const key = prompt("Enter new Gemini API Key:", localStorage.getItem('BCC_GEMINI_API_KEY') || '');
+                      if (key !== null) {
+                        localStorage.setItem('BCC_GEMINI_API_KEY', key);
+                        toast.success("API Key saved securely to your browser!");
+                      }
+                    }}
+                    className="px-5 py-2.5 rounded-xl bg-bcc-yellow text-bcc-dark font-bold hover:bg-yellow-400 transition-colors"
+                  >
+                    Update Key
+                  </button>
+                </div>
+                
+                <div className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10">
+                  <div>
+                    <h3 className="font-bold text-red-400 text-lg">Clear Local Database</h3>
+                    <p className="text-sm text-gray-400 mt-1">Wipe all events and reset to default mock data.</p>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      if (window.confirm("Are you sure? This will delete all your events!")) {
+                        localStorage.removeItem('bcc_events_v2');
+                        window.location.reload();
+                      }
+                    }}
+                    className="px-5 py-2.5 rounded-xl bg-red-500/10 text-red-400 font-bold hover:bg-red-500/20 border border-red-500/20 transition-colors"
+                  >
+                    Reset Data
+                  </button>
                 </div>
               </div>
             </motion.div>

@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { Map, LayoutGrid } from 'lucide-react';
+import { Map, LayoutGrid, SearchX } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import FilterBar from '../components/FilterBar';
@@ -69,6 +69,11 @@ export default function Home() {
       <Helmet>
         <title>Business Connect Community | Ibadan Events & Networking</title>
         <meta name="description" content="Discover the best professional networking, creative, and business events happening in Ibadan. Find opportunities and grow your community." />
+        <meta property="og:title" content="Business Connect Community | Ibadan Events & Networking" />
+        <meta property="og:description" content="Discover the best professional networking, creative, and business events happening in Ibadan." />
+        <meta property="og:image" content="/logo.jpg" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
       </Helmet>
       <Header />
       
@@ -212,26 +217,51 @@ export default function Home() {
                 </motion.div>
               )
             ) : (
-              <div className="text-center py-20 bg-bcc-card/50 rounded-3xl border border-white/5">
-                <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-3xl">🏜️</span>
-                </div>
-                <h3 className="text-2xl font-display font-bold text-white mb-2">No events found</h3>
-                <p className="text-bcc-muted max-w-md mx-auto">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-24 bg-bcc-card/40 backdrop-blur-sm rounded-[2rem] border border-white/5 shadow-2xl relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
+                <motion.div 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                  className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10 shadow-[0_0_30px_rgba(255,255,255,0.05)]"
+                >
+                  <SearchX className="w-10 h-10 text-bcc-muted" />
+                </motion.div>
+                <motion.h3 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-3xl font-display font-bold text-white mb-3"
+                >
+                  No events found
+                </motion.h3>
+                <motion.p 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-bcc-muted max-w-md mx-auto text-lg"
+                >
                   We couldn't find any events matching your current filters. Try adjusting your search or clearing the filters.
-                </p>
-                <button 
+                </motion.p>
+                <motion.button 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
                   onClick={() => {
                     setSearchQuery('');
                     setSelectedCategory('All');
                     setSelectedArea('All');
                     setSelectedPrice('All');
                   }}
-                  className="mt-6 text-bcc-yellow hover:text-yellow-400 font-medium hover:underline transition-colors"
+                  className="mt-8 px-6 py-3 rounded-xl bg-bcc-yellow/10 text-bcc-yellow hover:bg-bcc-yellow/20 font-bold transition-all hover:scale-105 active:scale-95"
                 >
                   Clear all filters
-                </button>
-              </div>
+                </motion.button>
+              </motion.div>
             )}
           </div>
         </section>

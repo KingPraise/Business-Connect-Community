@@ -40,6 +40,7 @@ export default function UserDashboard() {
     <div className="min-h-screen flex flex-col bg-bcc-dark text-white">
       <Helmet>
         <title>My Dashboard | Business Connect Community</title>
+        <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <Header />
       
@@ -73,19 +74,45 @@ export default function UserDashboard() {
           </div>
 
           {rsvps.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Ticket className="w-8 h-8 text-gray-500" />
-              </div>
-              <h3 className="text-xl font-medium mb-2">No tickets yet</h3>
-              <p className="text-gray-400 mb-6">You haven't RSVP'd to any upcoming events.</p>
-              <button 
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-20 bg-bcc-card/40 backdrop-blur-sm rounded-3xl border border-white/5"
+            >
+              <motion.div 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10"
+              >
+                <Ticket className="w-10 h-10 text-bcc-muted" />
+              </motion.div>
+              <motion.h3 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="text-2xl font-bold font-display mb-3"
+              >
+                No tickets yet
+              </motion.h3>
+              <motion.p 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="text-bcc-muted mb-8 text-lg"
+              >
+                You haven't RSVP'd to any upcoming events.
+              </motion.p>
+              <motion.button 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
                 onClick={() => navigate('/')}
-                className="bg-bcc-yellow text-bcc-dark px-6 py-2.5 rounded-full font-medium hover:bg-yellow-400 transition-colors"
+                className="bg-bcc-yellow text-bcc-dark px-8 py-3.5 rounded-xl font-bold hover:bg-yellow-400 transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(245,197,24,0.2)]"
               >
                 Discover Events
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           ) : (
             <div className="space-y-4">
               {rsvps.map((event, idx) => (
